@@ -108,6 +108,7 @@ export default function App() {
               selectedId={selectedId}
               onCloseMovie={handleCloseMovie}
               onAddWatched={handleAddWatched}
+              watched={watched}
             />
           ) : (
             <>
@@ -212,10 +213,14 @@ function Movie({ movie, onSelectMovie }) {
   );
 }
 
-function SelectedMovie({ selectedId, onCloseMovie, onAddWatched }) {
+function SelectedMovie({ selectedId, onCloseMovie, onAddWatched, watched }) {
   const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState("");
+  const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
+  const watchedUserRating = watched.find(
+    (movie) => movie.imdbID === selectedId
+  )?.userRating; // Use userRating instead of setUserRating
 
   const {
     Title: title,
@@ -249,6 +254,7 @@ function SelectedMovie({ selectedId, onCloseMovie, onAddWatched }) {
 
     async function getMovieDetails() {
       try {
+        setIsLoading(true);
         const res = await fetch(
           `http://www.omdbapi.com/?i=${selectedId}&apikey=${KEY}`
         );
@@ -261,6 +267,8 @@ function SelectedMovie({ selectedId, onCloseMovie, onAddWatched }) {
         setMovie(data);
       } catch (err) {
         console.error(err.message); // Handle error appropriately
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -292,12 +300,21 @@ function SelectedMovie({ selectedId, onCloseMovie, onAddWatched }) {
 
         <section>
           <div className="rating">
-            <StarRating maxRating={10} size={24} onSetRating={setUserRating} />
-
-            {userRating > 0 && (
-              <button className="btn-add" onClick={handleAdd}>
-                + Add to list
-              </button>
+            {!isWatched ? (
+              <>
+                <StarRating
+                  maxRating={10}
+                  size={24}
+                  onSetRating={setUserRating}
+                />
+                {userRating > 0 && (
+                  <button className="btn-add" onClick={handleAdd}>
+                    + Add to list
+                  </button>
+                )}
+              </>
+            ) : (
+              <p>You rated this movie {watchedUserRating} / 10</p> // Display the user rating
             )}
           </div>
           <p>

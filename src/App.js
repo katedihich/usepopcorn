@@ -281,55 +281,72 @@ function SelectedMovie({ selectedId, onCloseMovie, onAddWatched, watched }) {
     getMovieDetails();
   }, [selectedId]);
 
+  //Change title in browser when movie is selected
+  useEffect(
+    function () {
+      if (!title) return;
+      document.title = `Movie | ${title}`;
+
+      return function () {
+        document.title = "usePopcorn";
+      };
+    },
+    [title]
+  );
+
   return (
     <div className="details">
-      <>
-        <header>
-          <button className="btn-back" onClick={onCloseMovie}>
-            &larr;
-          </button>
-          <img src={poster} alt={`Poster of ${movie} movie`} />
-          <div className="details-overview">
-            <h2>{title}</h2>
-            <p>
-              {released} &bull; {runtime}
-            </p>
-            <p>{genre}</p>
-            <p>
-              <span>⭐️</span>
-              {imdbRating} IMDb rating
-            </p>
-          </div>
-        </header>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <>
+          <header>
+            <button className="btn-back" onClick={onCloseMovie}>
+              &larr;
+            </button>
+            <img src={poster} alt={`Poster of ${movie} movie`} />
+            <div className="details-overview">
+              <h2>{title}</h2>
+              <p>
+                {released} &bull; {runtime}
+              </p>
+              <p>{genre}</p>
+              <p>
+                <span>⭐️</span>
+                {imdbRating} IMDb rating
+              </p>
+            </div>
+          </header>
 
-        {/* <p>{avgRating}</p> */}
+          {/* <p>{avgRating}</p> */}
 
-        <section>
-          <div className="rating">
-            {!isWatched ? (
-              <>
-                <StarRating
-                  maxRating={10}
-                  size={24}
-                  onSetRating={setUserRating}
-                />
-                {userRating > 0 && (
-                  <button className="btn-add" onClick={handleAdd}>
-                    + Add to list
-                  </button>
-                )}
-              </>
-            ) : (
-              <p>You rated this movie {watchedUserRating} / 10</p> // Display the user rating
-            )}
-          </div>
-          <p>
-            <em>{plot}</em>
-          </p>
-          <p>Starring {actors}</p>
-          <p>Directed by {director}</p>
-        </section>
-      </>
+          <section>
+            <div className="rating">
+              {!isWatched ? (
+                <>
+                  <StarRating
+                    maxRating={10}
+                    size={24}
+                    onSetRating={setUserRating}
+                  />
+                  {userRating > 0 && (
+                    <button className="btn-add" onClick={handleAdd}>
+                      + Add to list
+                    </button>
+                  )}
+                </>
+              ) : (
+                <p>You rated this movie {watchedUserRating} / 10</p> // Display the user rating
+              )}
+            </div>
+            <p>
+              <em>{plot}</em>
+            </p>
+            <p>Starring {actors}</p>
+            <p>Directed by {director}</p>
+          </section>
+        </>
+      )}
     </div>
   );
 }

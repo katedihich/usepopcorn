@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import StarRating from "./StarRating";
 
 // const popularData = [
@@ -161,6 +161,14 @@ function NavBar({ children }) {
 }
 
 function Search({ query, setQuery }) {
+  const inputEl = useRef(null);
+
+  useEffect(() => {
+    if (inputEl.current) {
+      inputEl.current.focus(); // Focus on the input element after the component is mounted
+    }
+  }, []); // The empty dependency array ensures this runs only once after the initial render
+
   return (
     <input
       className="search"
@@ -168,6 +176,7 @@ function Search({ query, setQuery }) {
       placeholder="Search movies..."
       value={query}
       onChange={(e) => setQuery(e.target.value)}
+      ref={inputEl} // Assign the input element to inputEl
     />
   );
 }
@@ -261,7 +270,7 @@ function SelectedMovie({ selectedId, onCloseMovie, onAddWatched, watched }) {
       title,
       poster,
       imdbRating: Number(imdbRating),
-      runtime: Number(runtime.split("").at(0)),
+      runtime: Number(runtime.replace(" min", "")),
       userRating,
     };
     onAddWatched(newWatchedMovie);
@@ -300,6 +309,7 @@ function SelectedMovie({ selectedId, onCloseMovie, onAddWatched, watched }) {
         if (data.Response === "False") throw new Error(data.Error);
 
         setMovie(data);
+        console.log(data);
       } catch (err) {
         console.error(err.message); // Handle error appropriately
       } finally {
